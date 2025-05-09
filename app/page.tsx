@@ -2,8 +2,6 @@ import ChatInterface from "@/app/components/ChatInterface";
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50">
-      <ChatInterface />
-    </main>
+    <div className="flex-1 h-full"><ChatInterface /></div>
   );
 }

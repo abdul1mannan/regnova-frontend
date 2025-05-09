@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ChatWindow from "@/app/components/ChatWindow";
 import MessageInput from "@/app/components/MessageInput";
 import FileUploader from "@/app/components/FileUploader";
@@ -9,13 +9,13 @@ export default function ChatInterface() {
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>(
     []
   );
-  const [fileId, setFileId] = useState<string | null>(null);
+  const chatWindowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMessages([
       {
         sender: "REGNOVA Bot",
-        text: "Hello! I'm REGNOVA Bot. How can I help you today?\n\nYou can ask questions about product classification, regulations, or anything else.",
+        text: "Hello! I'm Regenova Compliance Assistant . How can I help you today?\n\nYou can ask questions about product classification, regulations, or anything else.",
       },
     ]);
   }, []);
@@ -23,9 +23,7 @@ export default function ChatInterface() {
   const addMessage = async (message: { sender: string; text: string }) => {
     setMessages((prev) => [...prev, message]);
     if (message.sender === "User") {
-      const textToSend = fileId
-        ? `For file ID ${fileId}: ${message.text}`
-        : message.text;
+      const textToSend = message.text;
 
       try {
         const response = await fetch("http://localhost:8000/chat/ask", {
@@ -53,18 +51,13 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="w-full h-screen bg-gray-50">
-      {/* Fixed Header */}
-      <header className="fixed top-0 left-0 w-full bg-white z-10 shadow-sm border-b border-gray-200">
-        <div className="max-w-full text-center py-4 font-semibold text-lg text-gray-700">
-          REGNOVA Bot
-        </div>
-      </header>
-      {/* Main Chat Area */}
-      <div className="w-full h-full bg-white rounded-none shadow-none p-0 flex flex-col pt-16">
+    <div className="w-full h-full bg-[#EEF2F5] flex flex-col relative">
+      <div className="flex-1 overflow-y-auto px-2 pb-20" ref={chatWindowRef}>
         <ChatWindow messages={messages} />
-        <div className="flex items-center space-x-2 bg-gray-100 rounded-none p-4">
-          <FileUploader addMessage={addMessage} setFileId={setFileId} />
+      </div>
+      <div className="absolute bottom-0 left-0 w-full bg-white border-t border-[#ced6d3] z-10">
+        <div className="flex justify-center items-center space-x-3 bg-[#EEF2F5] rounded-lg p-3">
+          <FileUploader addMessage={addMessage} />
           <MessageInput addMessage={addMessage} />
         </div>
       </div>
