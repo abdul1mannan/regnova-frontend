@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import ChatWindow from "@/app/components/ChatWindow";
 import MessageInput from "@/app/components/MessageInput";
 import FileUploader from "@/app/components/FileUploader";
-
 export default function ChatInterface() {
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>(
     []

@@ -1,4 +1,5 @@
 import "./globals.css";
+import "./styles/fonts.css";
 import Image from "next/image";
 import ComplianceAssistant from "./components/ComplianceAssistant";
 

@@ -23,14 +23,6 @@ export default function FileUploader({ addMessage }: FileUploaderProps) {
       const data = await response.json();
 
       if (response.ok) {
-        addMessage({
-          sender: "User",
-          text: `Uploaded file: ${e.target.files[0].name}`,
-        });
-        addMessage({
-          sender: "REGNOVA Bot",
-          text: "File uploaded successfully! You can now ask questions about it.",
-        });
       } else {
         throw new Error(data.message || "Upload failed");
       }
