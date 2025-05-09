@@ -4,10 +4,14 @@ import { useState, useEffect, useRef } from "react";
 import ChatWindow from "@/app/components/ChatWindow";
 import MessageInput from "@/app/components/MessageInput";
 import FileUploader from "@/app/components/FileUploader";
+import { v4 as uuidv4 } from "uuid";
+
 export default function ChatInterface() {
   const [messages, setMessages] = useState<{ sender: string; text: string }[]>(
     []
   );
+  const [userId] = useState<string>(() => uuidv4());
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const chatWindowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,7 +34,11 @@ export default function ChatInterface() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ message: textToSend }),
+          body: JSON.stringify({
+            message: textToSend,
+            user_id: userId,
+            ...(sessionId ? { session_id: sessionId } : {}),
+          }),
         });
         const data = await response.json();
         setMessages((prev) => [
@@ -56,7 +64,11 @@ export default function ChatInterface() {
       </div>
       <div className="absolute bottom-0 left-0 w-full bg-white border-t border-[#ced6d3] z-10">
         <div className="flex justify-center items-center space-x-3 bg-[#EEF2F5] rounded-lg p-3">
-          <FileUploader addMessage={addMessage} />
+          <FileUploader
+            addMessage={addMessage}
+            userId={userId}
+            setSessionId={setSessionId}
+          />
           <MessageInput addMessage={addMessage} />
         </div>
       </div>

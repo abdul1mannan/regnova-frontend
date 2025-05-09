@@ -1,6 +1,114 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "./styles/fonts.css";
+
+@font-face {
+  font-family: 'Circular Std';
+  src: url('../public/Regnova_Font/CircularStd-Book.eot');
+  src: url('../public/Regnova_Font/CircularStd-Book.eot?#iefix') format('embedded-opentype'),
+       url('../public/Regnova_Font/CircularStd-Book.woff2') format('woff2'),
+       url('../public/Regnova_Font/CircularStd-Book.woff') format('woff'),
+       url('../public/Regnova_Font/CircularStd-Book.ttf') format('truetype'),
+       url('../public/Regnova_Font/CircularStd-Book.svg#CircularStd-Book') format('svg');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Circular Std';
+  src: url('../public/Regnova_Font/CircularStd-BookItalic.eot');
+  src: url('../public/Regnova_Font/CircularStd-BookItalic.eot?#iefix') format('embedded-opentype'),
+       url('../public/Regnova_Font/CircularStd-BookItalic.woff2') format('woff2'),
+       url('../public/Regnova_Font/CircularStd-BookItalic.woff') format('woff'),
+       url('../public/Regnova_Font/CircularStd-BookItalic.ttf') format('truetype'),
+       url('../public/Regnova_Font/CircularStd-BookItalic.svg#CircularStd-BookItalic') format('svg');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Circular Std';
+  src: url('../public/Regnova_Font/CircularStd-Medium.eot');
+  src: url('../public/Regnova_Font/CircularStd-Medium.eot?#iefix') format('embedded-opentype'),
+       url('../public/Regnova_Font/CircularStd-Medium.woff2') format('woff2'),
+       url('../public/Regnova_Font/CircularStd-Medium.woff') format('woff'),
+       url('../public/Regnova_Font/CircularStd-Medium.ttf') format('truetype'),
+       url('../public/Regnova_Font/CircularStd-Medium.svg#CircularStd-Medium') format('svg');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Circular Std';
+  src: url('../public/Regnova_Font/CircularStd-MediumItalic.eot');
+  src: url('../public/Regnova_Font/CircularStd-MediumItalic.eot?#iefix') format('embedded-opentype'),
+       url('../public/Regnova_Font/CircularStd-MediumItalic.woff2') format('woff2'),
+       url('../public/Regnova_Font/CircularStd-MediumItalic.woff') format('woff'),
+       url('../public/Regnova_Font/CircularStd-MediumItalic.ttf') format('truetype'),
+       url('../public/Regnova_Font/CircularStd-MediumItalic.svg#CircularStd-MediumItalic') format('svg');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Circular Std';
+  src: url('../public/Regnova_Font/CircularStd-Bold.eot');
+  src: url('../public/Regnova_Font/CircularStd-Bold.eot?#iefix') format('embedded-opentype'),
+       url('../public/Regnova_Font/CircularStd-Bold.woff2') format('woff2'),
+       url('../public/Regnova_Font/CircularStd-Bold.woff') format('woff'),
+       url('../public/Regnova_Font/CircularStd-Bold.ttf') format('truetype'),
+       url('../public/Regnova_Font/CircularStd-Bold.svg#CircularStd-Bold') format('svg');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Circular Std';
+  src: url('../public/Regnova_Font/CircularStd-BoldItalic.eot');
+  src: url('../public/Regnova_Font/CircularStd-BoldItalic.eot?#iefix') format('embedded-opentype'),
+       url('../public/Regnova_Font/CircularStd-BoldItalic.woff2') format('woff2'),
+       url('../public/Regnova_Font/CircularStd-BoldItalic.woff') format('woff'),
+       url('../public/Regnova_Font/CircularStd-BoldItalic.ttf') format('truetype'),
+       url('../public/Regnova_Font/CircularStd-BoldItalic.svg#CircularStd-BoldItalic') format('svg');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Circular Std';
+  src: url('../public/Regnova_Font/CircularStd-Black.eot');
+  src: url('../public/Regnova_Font/CircularStd-Black.eot?#iefix') format('embedded-opentype'),
+       url('../public/Regnova_Font/CircularStd-Black.woff2') format('woff2'),
+       url('../public/Regnova_Font/CircularStd-Black.woff') format('woff'),
+       url('../public/Regnova_Font/CircularStd-Black.ttf') format('truetype'),
+       url('../public/Regnova_Font/CircularStd-Black.svg#CircularStd-Black') format('svg');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Circular Std';
+  src: url('../public/Regnova_Font/CircularStd-BlackItalic.eot');
+  src: url('../public/Regnova_Font/CircularStd-BlackItalic.eot?#iefix') format('embedded-opentype'),
+       url('../public/Regnova_Font/CircularStd-BlackItalic.woff2') format('woff2'),
+       url('../public/Regnova_Font/CircularStd-BlackItalic.woff') format('woff'),
+       url('../public/Regnova_Font/CircularStd-BlackItalic.ttf') format('truetype'),
+       url('../public/Regnova_Font/CircularStd-BlackItalic.svg#CircularStd-BlackItalic') format('svg');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+html, body {
+  font-family: 'Circular Std', sans-serif !important;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

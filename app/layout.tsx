@@ -1,5 +1,4 @@
 import "./globals.css";
-import "./styles/fonts.css";
 import Image from "next/image";
 import ComplianceAssistant from "./components/ComplianceAssistant";
 
@@ -14,7 +13,7 @@ export default function RootLayout({
         <header className="fixed top-0 left-0 w-full bg-[#ffffff] z-10 ">
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-center">
             <div className="flex items-center space-x-3">
-              <Image  
+              <Image
                 src="/Flatten_Regnova_logo_on_LightBG.png"
                 alt="Regnova Logo"
                 width={100}

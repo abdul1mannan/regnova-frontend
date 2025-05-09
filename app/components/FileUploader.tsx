@@ -2,9 +2,14 @@ import { useState } from "react";
 
 interface FileUploaderProps {
   addMessage: (message: { sender: string; text: string }) => void;
+  userId: string;
+  setSessionId: (sessionId: string | null) => void;
 }
 
-export default function FileUploader({ addMessage }: FileUploaderProps) {
+export default function FileUploader({
+  addMessage,
+  setSessionId,
+}: FileUploaderProps) {
   const [isUploading, setIsUploading] = useState(false);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -15,7 +20,7 @@ export default function FileUploader({ addMessage }: FileUploaderProps) {
     formData.append("file", e.target.files[0]);
 
     try {
-      const response = await fetch("http://localhost:8000/userdoc/upload", {
+      const response = await fetch(`http://localhost:8000/temp/process-temp`, {
         method: "POST",
         body: formData,
       });
@@ -23,13 +28,20 @@ export default function FileUploader({ addMessage }: FileUploaderProps) {
       const data = await response.json();
 
       if (response.ok) {
+        setSessionId(data.session_id || null);
+        addMessage({
+          sender: "REGNOVA Bot",
+          text: `File uploaded successfully. You can now ask questions about this document`,
+        });
       } else {
-        throw new Error(data.message || "Upload failed");
+        throw new Error(data.detail || data.message || "Upload failed");
       }
-    } catch {
+    } catch (error: unknown) {
       addMessage({
         sender: "REGNOVA Bot",
-        text: "Error uploading file. Please try again.",
+        text: `Error uploading file: ${
+          error instanceof Error ? error.message : JSON.stringify(error)
+        }`,
       });
     } finally {
       setIsUploading(false);
