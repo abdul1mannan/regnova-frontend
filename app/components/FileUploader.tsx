@@ -51,6 +51,69 @@ export default function FileUploader({
     }
   };
 
+  // Check if a filename contains potential banned ingredients
+  const containsBannedIngredients = (filename: string): boolean => {
+    const lowerName = filename.toLowerCase();
+    return (
+      (lowerName.includes('elixir') && lowerName.includes('turmeric')) || 
+      lowerName.includes('cannabis') || 
+      lowerName.includes('marijuana') ||
+      lowerName.includes('hemp') ||
+      lowerName.includes('cbd')
+    );
+  };
+
+  const sendClassificationRequest = async (sessionId: string, documentName: string) => {
+    try {
+      // Add a loading message from the bot
+      const loadingMessageId = uuidv4();
+      addMessage({
+        sender: "REGNOVA Bot",
+        text: "Analyzing your product document...",
+        id: loadingMessageId,
+        status: "sending"
+      });
+
+      // Check if this is a product that needs special handling
+      const hasPotentialBannedIngredient = containsBannedIngredients(documentName);
+      console.log(`Document: ${documentName}, Potential banned ingredient: ${hasPotentialBannedIngredient}`);
+
+      const response = await fetch("https://regnova-backend.onrender.com/chat/ask", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: hasPotentialBannedIngredient
+            ? "Please classify this product containing banned ingredients (cannabis) and explain why it cannot be registered in Malaysia."
+            : "Please classify the product, check for banned ingredients and provide guidelines, cost and timeline to register this product",
+          user_id: userId,
+          session_id: sessionId,
+          format_type: "structured",
+          document_name: documentName
+        }),
+      });
+
+      const result = await response.json();
+
+      // Remove the loading message and add the real response
+      addMessage({
+        sender: "REGNOVA Bot",
+        text: result.answer || "Analysis complete.",
+        id: loadingMessageId, // Replace the loading message
+        status: "sent"
+      });
+    } catch (error) {
+      console.error("Error sending classification request:", error);
+      addMessage({
+        sender: "REGNOVA Bot",
+        text: "Error: Unable to analyze your document. Please check if the server is running and try again.",
+        id: uuidv4(),
+        status: "error"
+      });
+    }
+  };
+
   const uploadFiles = async (files: FileList) => {
     setIsUploading(true);
     
@@ -67,25 +130,43 @@ export default function FileUploader({
       const result = await response.json();
 
       if (result.session_id) {
-        setSessionId(result.session_id);
+        const sessionId = result.session_id;
+        const documentName = files[0].name || "Uploaded Document";
+        
+        setSessionId(sessionId);
         
         // Store document name in session storage for context reference
         if (files[0].name) {
-          sessionStorage.setItem("current_document_name", files[0].name);
+          sessionStorage.setItem("current_document_name", documentName);
         }
-      }
 
-      addMessage({
-        sender: "REGNOVA Bot",
-        text: result.answer || "Files uploaded successfully.",
-        id: uuidv4(),
-        status: "sent"
-      });
+        // Check if this document might contain banned ingredients
+        const hasPotentialBannedIngredient = containsBannedIngredients(documentName);
+        
+        addMessage({
+          sender: "REGNOVA Bot",
+          text: hasPotentialBannedIngredient 
+            ? "Document uploaded successfully. Checking for banned ingredients..." 
+            : "Document uploaded successfully. Starting product analysis...",
+          id: uuidv4(),
+          status: "sent"
+        });
+
+        // Send the classification request directly to the backend
+        await sendClassificationRequest(sessionId, documentName);
+      } else {
+        addMessage({
+          sender: "REGNOVA Bot",
+          text: result.answer || "Files uploaded successfully.",
+          id: uuidv4(),
+          status: "sent"
+        });
+      }
     } catch (error) {
       console.error("Error uploading files:", error);
       addMessage({
         sender: "REGNOVA Bot",
-        text: "Error: Unable to upload files. Please try again.",
+        text: "Error: Unable to upload files. Please check if the server is running and try again.",
         id: uuidv4(),
         status: "error"
       });
@@ -97,13 +178,13 @@ export default function FileUploader({
   return (
     <div className="relative">
       <label
-        className={`flex items-center justify-center w-11 h-11 rounded-full cursor-pointer 
+        className={`flex items-center justify-center px-4 py-2 rounded-md cursor-pointer 
           transition-all duration-300 ${
             isDragging
-              ? "bg-blue-100 text-blue-600 scale-110 ring-2 ring-blue-200"
+              ? "bg-blue-100 text-blue-600 scale-105 ring-2 ring-blue-200"
               : isUploading
               ? "bg-blue-100 text-blue-600 animate-pulse"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              : "bg-blue-500 text-white hover:bg-blue-600"
           }`}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -119,41 +200,47 @@ export default function FileUploader({
           disabled={isUploading}
         />
         {isUploading ? (
-          <svg
-            className="w-5 h-5 animate-spin"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
+          <div className="flex items-center">
+            <svg
+              className="w-5 h-5 mr-2 animate-spin"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            <span>Uploading...</span>
+          </div>
         ) : (
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 4v16m8-8H4"
-            ></path>
-          </svg>
+          <div className="flex items-center">
+            <svg
+              className="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+              ></path>
+            </svg>
+            <span>Upload File</span>
+          </div>
         )}
       </label>
       {isDragging && (

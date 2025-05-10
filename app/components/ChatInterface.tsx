@@ -68,16 +68,65 @@ export default function ChatInterface() {
     }
   }, [selectedCountry]);
 
-  // Auto-scroll to bottom when messages change
+  // Enhanced auto-scroll to position the start of the latest message in view
+  useEffect(() => {
+    scrollToLatestMessageStart();
+  }, [messages]);
+
+  // Also scroll when loading state changes
+  useEffect(() => {
+    if (!isLoading) {
+      scrollToLatestMessageStart();
+    }
+  }, [isLoading]);
+
+  // Function to scroll the latest message start into view
+  const scrollToLatestMessageStart = () => {
+    if (chatWindowRef.current && messages.length > 0) {
+      // Get all message elements
+      const messageElements = chatWindowRef.current.querySelectorAll('.message-container');
+      
+      if (messageElements.length > 0) {
+        // Get the latest message element
+        const latestMessageElement = messageElements[messageElements.length - 1];
+        
+        // Calculate the position to scroll to: enough to show the latest message's top part
+        const scrollPosition = Math.max(
+          0,
+          latestMessageElement.getBoundingClientRect().top + 
+          chatWindowRef.current.scrollTop - 
+          chatWindowRef.current.getBoundingClientRect().top - 
+          80 // Offset to show the message heading plus some context
+        );
+        
+        // Scroll to position that shows the start of the latest message
+        chatWindowRef.current.scrollTo({
+          top: scrollPosition,
+          behavior: 'smooth'
+        });
+      }
+    }
+  };
+
+  // Add a mutation observer to detect when message content changes
   useEffect(() => {
     if (chatWindowRef.current) {
-      const scrollContainer = chatWindowRef.current;
-      scrollContainer.scrollTo({
-        top: scrollContainer.scrollHeight,
-        behavior: "smooth",
+      // Create a MutationObserver to detect when content is added
+      const observer = new MutationObserver(() => {
+        scrollToLatestMessageStart();
       });
+      
+      // Start observing the chat window for content changes
+      observer.observe(chatWindowRef.current, { 
+        childList: true,
+        subtree: true,
+        characterData: true
+      });
+      
+      // Clean up observer when component unmounts
+      return () => observer.disconnect();
     }
-  }, [messages]);
+  }, []);
 
   const addMessage = async (message: { 
     sender: string; 
@@ -159,7 +208,7 @@ export default function ChatInterface() {
           ...prev,
           {
             sender: "REGNOVA Bot",
-            text: "Error: Unable to fetch response from backend. Please try again.",
+            text: "Error: Unable to fetch response from backend. Please check if the server is running and try again.",
             id: uuidv4(),
             timestamp: new Date(),
             status: "error",
