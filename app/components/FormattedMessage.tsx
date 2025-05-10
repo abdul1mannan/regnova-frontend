@@ -22,17 +22,52 @@ const FormattedMessage: React.FC<FormattedMessageProps> = ({ text }) => {
   // Process text to enhance formatting
   const formatText = (input: string) => {
     // Replace section separators (em dashes) with styled dividers
-    let formatted = input.replace(/⸻/g, '<hr class="my-5 border-t border-slate-200" />');
+    let formatted = input.replace(/⸻/g, '<hr class="my-2 border border-slate-200" />');
     
-    // Format tables with proper styling
-    formatted = formatted.replace(
-      /\|(.+)\|\n\|(-+\|)+/g, 
-      '<table class="min-w-full my-3 border-collapse rounded-md overflow-hidden shadow-sm border border-slate-200"><thead class="bg-slate-50"><tr>$1</tr></thead><tbody>'
-    );
-    formatted = formatted.replace(/\|(.+)\|(?!\n\|(-+\|)+)/g, '<tr>$1</tr>');
-    formatted = formatted.replace(/\|([^|]+)/g, '<td class="border border-slate-200 px-3 py-2 text-sm">$1</td>');
-    formatted = formatted.replace(/<\/tr><\/tbody>\n<tr>/g, '</tr>\n<tr>');
-    formatted = formatted.replace(/<\/tr>\n(?!<tr>)/g, '</tr></tbody></table>');
+    // Improved table formatting
+    // First identify complete tables and process them as a unit
+    formatted = formatted.replace(/(\|\s*(.+)\s*\|\n\|[-\s|]+\|\n)((.*\|\n)+)/g, (match, headerSection, headerContent, bodySection) => {
+      // Process header
+      const headerRow = headerContent.trim().split('|').filter((cell: string) => cell.trim()).map((cell: string) => 
+        `<th class="border border-slate-200 px-3 py-2 text-sm font-medium bg-slate-50">${cell.trim()}</th>`
+      ).join('');
+      
+      // Process body rows
+      const bodyRows = bodySection.trim().split('\n').map((row: string) => {
+        const cells = row.trim().split('|').filter((cell: string) => cell.trim()).map((cell: string) => 
+          `<td class="border border-slate-200 px-3 py-2 text-sm">${cell.trim()}</td>`
+        ).join('');
+        return `<tr>${cells}</tr>`;
+      }).join('');
+      
+      // Combine into a complete table
+      return `<table class="min-w-full my-3 border-collapse rounded-md overflow-hidden shadow-sm border border-slate-200">
+        <thead><tr>${headerRow}</tr></thead>
+        <tbody>${bodyRows}</tbody>
+      </table>`;
+    });
+    
+    // Fallback for simpler tables without separation line
+    formatted = formatted.replace(/(\|\s*(.+)\s*\|\n)((.*\|\n)+)/g, (match, headerSection, headerContent, bodySection) => {
+      // Process header
+      const headerRow = headerContent.trim().split('|').filter((cell: string) => cell.trim()).map((cell: string) => 
+        `<th class="border border-slate-200 px-3 py-2 text-sm font-medium bg-slate-50">${cell.trim()}</th>`
+      ).join('');
+      
+      // Process body rows
+      const bodyRows = bodySection.trim().split('\n').map((row: string) => {
+        const cells = row.trim().split('|').filter((cell: string) => cell.trim()).map((cell: string) => 
+          `<td class="border border-slate-200 px-3 py-2 text-sm">${cell.trim()}</td>`
+        ).join('');
+        return `<tr>${cells}</tr>`;
+      }).join('');
+      
+      // Combine into a complete table
+      return `<table class="min-w-full my-3 border-collapse rounded-md overflow-hidden shadow-sm border border-slate-200">
+        <thead><tr>${headerRow}</tr></thead>
+        <tbody>${bodyRows}</tbody>
+      </table>`;
+    });
 
     // Format emoji indicators more prominently
     const emojis = {
@@ -44,6 +79,10 @@ const FormattedMessage: React.FC<FormattedMessageProps> = ({ text }) => {
       '📄': 'bg-sky-50 text-sky-700 border-sky-100',         // Documentation
       '📌': 'bg-rose-50 text-rose-700 border-rose-100',      // Important notes
       '📋': 'bg-indigo-50 text-indigo-700 border-indigo-100', // List
+      '🏷️': 'bg-emerald-50 text-emerald-700 border-emerald-100', // Labeling
+      '📦': 'bg-cyan-50 text-cyan-700 border-cyan-100',     // Packaging
+      '🌏': 'bg-violet-50 text-violet-700 border-violet-100', // Market-specific
+      '💊': 'bg-orange-50 text-orange-700 border-orange-100', // Ingredient analysis
     };
 
     // Loop through emoji indicators and apply custom styling
