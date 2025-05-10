@@ -59,7 +59,7 @@ export default function FileUploader({
       formData.append("user_id", userId);
       formData.append("file", files[0]);
 
-      const response = await fetch("http://localhost:8000/temp/process-temp", {
+      const response = await fetch("https://regnova-backend.onrender.com/temp/process-temp", {
         method: "POST",
         body: formData,
       });

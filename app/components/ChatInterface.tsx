@@ -116,7 +116,7 @@ export default function ChatInterface() {
         // Get selected country from session storage
         const country = sessionStorage.getItem("selected_country");
 
-        const response = await fetch("http://localhost:8000/chat/ask", {
+        const response = await fetch("https://regnova-backend.onrender.com/chat/ask", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
